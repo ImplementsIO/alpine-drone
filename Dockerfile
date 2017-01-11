@@ -4,16 +4,17 @@ MAINTAINER Thonatos.Yang <thonatos.yang@gmail.com>
 LABEL vendor=implements.io
 LABEL io.implements.version=0.1.0
 
-# Build config
-ENV GOPATH /usr/local
-ENV DRONE_PATH github.com/drone/drone
-ENV DRONE_REPO git://github.com/drone/drone.git
-ENV DRONE_BRANCH master
+# For Build
+ENV GOPATH=/usr/local
+ENV DRONE_PATH=github.com/drone/drone
+ENV DRONE_REPO=git://github.com/drone/drone.git
+ENV DRONE_BRANCH=master
 ENV GO15VENDOREXPERIMENT=1
 
-# Run config
+# For Run
 ENV DATABASE_DRIVER=sqlite3
-ENV DATABASE_PATH = /var/lib/drone
+ENV DRONE_DATABASE_DRIVER=sqlite3
+ENV DATABASE_PATH=/var/lib/drone
 ENV DATABASE_CONFIG=$DATABASE_PATH/drone.sqlite
 ENV GODEBUG=netdns=go
 
@@ -26,11 +27,12 @@ RUN apk update \
     && make deps \
     && make gen \
     && make build \
-    && cp release/drone /drone
+    && mv release/drone /drone
 
 # Clean
-RUN apk del build-base git \
-    && rm -rf /usr/include /usr/share/man /tmp/* /var/cache/apk/* /root/build/     
+RUN apk del build-base git go \
+    && rm -rf /usr/local/* /var/cache/apk/* \
+    && rm -rf /usr/include /usr/share/man /tmp/* /root/build/     
     
 EXPOSE 8000
 
